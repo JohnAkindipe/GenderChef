@@ -33,6 +33,22 @@ body {
     margin-bottom: 2rem;
 }
 
+.score-display {
+    margin-bottom: 2rem;
+}
+
+.score-text,
+.round-text {
+    font-size: 1.1rem;
+    color: #000000;
+    margin: 0.5rem 0;
+}
+
+.score-text span,
+.round-text span {
+    font-weight: 600;
+}
+
 .search-container {
     display: flex;
     gap: 0.5rem;
@@ -67,5 +83,76 @@ body {
 }
 
 .search-btn:hover {
+    background-color: #333333;
+}
+
+.question-container {
+    margin-top: 3rem;
+}
+
+.question-text {
+    font-size: 1.25rem;
+    color: #000000;
+    margin-bottom: 2rem;
+    font-weight: 500;
+}
+
+.options-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 400px;
+    margin: 0 auto;
+    margin-bottom: 2rem;
+}
+
+.option-label {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background-color: white;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.option-label:hover {
+    border-color: #000000;
+}
+
+.option-radio {
+    margin-right: 1rem;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.option-text {
+    font-size: 1rem;
+    color: #000000;
+}
+
+.option-label:has(.option-radio:checked) {
+    background-color: #000000;
+    border-color: #000000;
+}
+
+.option-label:has(.option-radio:checked) .option-text {
+    color: white;
+}
+
+.submit-btn {
+    padding: 0.75rem 2rem;
+    font-size: 1rem;
+    background-color: #000000;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.submit-btn:hover {
     background-color: #333333;
 }
