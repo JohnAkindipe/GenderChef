@@ -6,7 +6,6 @@ let currentRound = 1;
 const totalRounds = 10;
 let usedNames = new Set(); // Track names used in current game session
 
-// API Keys - NOTE: In production, API keys should be stored on the backend
 const SPOONACULAR_API_KEY = 'd0552c86319a42a784bfd064c5b485dd';
 
 // DOM elements
@@ -21,6 +20,12 @@ const roundValue = document.getElementById('roundValue');
 const gameOverContainer = document.getElementById('gameOverContainer');
 const gameOverMessage = document.getElementById('gameOverMessage');
 const playAgainBtn = document.getElementById('playAgainBtn');
+const recipeDisplay = document.getElementById('recipeDisplay');
+const recipeTitle = document.getElementById('recipeTitle');
+const recipeImage = document.getElementById('recipeImage');
+const recipeTime = document.getElementById('recipeTime');
+const recipeLoader = document.getElementById('recipeLoader');
+const recipeError = document.getElementById('recipeError');
 
 // Fetch name data from Genderize API
 async function fetchNameData(name) {
@@ -45,7 +50,6 @@ async function fetchRandomRecipe() {
             throw new Error('Failed to fetch recipe data');
         }
         const data = await response.json();
-        console.log('Random Recipe:', data);
         return data;
     } catch (error) {
         console.error('Failed to fetch recipe:', error);
@@ -115,9 +119,8 @@ function checkAnswer(selectedOption) {
     // Check if actual probability falls within the selected range
     const isCorrect = actualProbability >= selectedRange.min && actualProbability <= selectedRange.max;
     
-    return { isCorrect, actualProbability };
+    return isCorrect
 }
-
 // Handle search button click
 searchBtn.addEventListener('click', async () => {
     const name = nameInput.value.trim().toLowerCase();
@@ -137,8 +140,6 @@ searchBtn.addEventListener('click', async () => {
     currentNameData = await fetchNameData(name);
     
     if (currentNameData) {
-        console.log('Name data:', currentNameData);
-        
         // Add name to used names
         usedNames.add(name);
         
@@ -151,7 +152,7 @@ searchBtn.addEventListener('click', async () => {
 });
 
 // Handle submit button click
-submitBtn.addEventListener('click', () => {
+submitBtn.addEventListener('click', async () => {
     // Get selected option
     const selectedOption = document.querySelector('input[name="probability"]:checked');
     
@@ -161,7 +162,7 @@ submitBtn.addEventListener('click', () => {
     }
     
     // Check if answer is correct
-    const { isCorrect, actualProbability } = checkAnswer(selectedOption.value);
+    const isCorrect = checkAnswer(selectedOption.value);
     
     // Update score if correct
     if (isCorrect) {
@@ -172,9 +173,6 @@ submitBtn.addEventListener('click', () => {
     if (currentRound === totalRounds) {
         // Update score one last time if correct
         updateScoreDisplay();
-        
-        // Fetch random recipe
-        fetchRandomRecipe();
         
         // Reset radio buttons at game end
         const radioButtons = document.querySelectorAll('input[name="probability"]');
@@ -197,10 +195,36 @@ submitBtn.addEventListener('click', () => {
         gameOverMessage.textContent = message;
         gameOverContainer.style.display = 'block';
         
+        // Fetch and display recipe only if score > 5
+        if (score > 5) {
+            // Show loader and hide play again button
+            recipeLoader.style.display = 'block';
+            playAgainBtn.style.display = 'none';
+            
+            const recipeData = await fetchRandomRecipe();
+            
+            // Hide loader
+            recipeLoader.style.display = 'none';
+            
+            if (recipeData && recipeData.recipes && recipeData.recipes[0]) {
+                // Success: Display recipe
+                const recipe = recipeData.recipes[0];
+                recipeTitle.textContent = `Shey o ma je ${recipe.title}`;
+                recipeImage.src = recipe.image;
+                recipeImage.alt = recipe.title;
+                recipeTime.textContent = `It will be ready in ${recipe.readyInMinutes} minutes`;
+                recipeDisplay.style.display = 'block';
+            } else {
+                // Error: Display error message
+                recipeError.style.display = 'block';
+            }
+            
+            // Show play again button after loading completes
+            playAgainBtn.style.display = 'inline-block';
+        }
+        
         // Reset used names for new game
         usedNames.clear();
-        
-        // TODO: Show recipes based on score
     } else {
         // Display result and tell user to enter next search
         alert(`${isCorrect ? 'Correct!' : 'Incorrect!'} Enter next search`);
@@ -225,6 +249,10 @@ playAgainBtn.addEventListener('click', () => {
     updateScoreDisplay();
     scoreDisplay.style.display = 'none';
     gameOverContainer.style.display = 'none';
+    recipeDisplay.style.display = 'none';
+    recipeLoader.style.display = 'none';
+    recipeError.style.display = 'none';
+    playAgainBtn.style.display = 'inline-block';
     document.querySelector('.search-container').style.display = 'flex';
     
     // Reset name input
