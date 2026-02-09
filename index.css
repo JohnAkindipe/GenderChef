@@ -33,6 +33,13 @@ body {
     margin-bottom: 2rem;
 }
 
+.subtitle + h3 {
+    color: #6b6f76;
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-top: 6px;
+}
+
 .score-display {
     margin-bottom: 2rem;
 }
@@ -154,5 +161,32 @@ body {
 }
 
 .submit-btn:hover {
+    background-color: #333333;
+}
+
+.game-over-container {
+    margin-top: 3rem;
+    text-align: center;
+}
+
+.game-over-message {
+    font-size: 2rem;
+    color: #000000;
+    font-weight: 600;
+    margin-bottom: 2rem;
+}
+
+.play-again-btn {
+    padding: 0.75rem 2rem;
+    font-size: 1rem;
+    background-color: #000000;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.play-again-btn:hover {
     background-color: #333333;
 }

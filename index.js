@@ -4,6 +4,10 @@ let askedGender = null;
 let score = 0;
 let currentRound = 1;
 const totalRounds = 10;
+let usedNames = new Set(); // Track names used in current game session
+
+// API Keys - NOTE: In production, API keys should be stored on the backend
+const SPOONACULAR_API_KEY = 'd0552c86319a42a784bfd064c5b485dd';
 
 // DOM elements
 const nameInput = document.getElementById('nameInput');
@@ -14,6 +18,9 @@ const submitBtn = document.getElementById('submitBtn');
 const scoreDisplay = document.getElementById('scoreDisplay');
 const scoreValue = document.getElementById('scoreValue');
 const roundValue = document.getElementById('roundValue');
+const gameOverContainer = document.getElementById('gameOverContainer');
+const gameOverMessage = document.getElementById('gameOverMessage');
+const playAgainBtn = document.getElementById('playAgainBtn');
 
 // Fetch name data from Genderize API
 async function fetchNameData(name) {
@@ -30,13 +37,30 @@ async function fetchNameData(name) {
     }
 }
 
+// Fetch random recipe from Spoonacular API
+async function fetchRandomRecipe() {
+    try {
+        const response = await fetch(`https://api.spoonacular.com/recipes/random?apiKey=${SPOONACULAR_API_KEY}&number=1`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch recipe data');
+        }
+        const data = await response.json();
+        console.log('Random Recipe:', data);
+        return data;
+    } catch (error) {
+        console.error('Failed to fetch recipe:', error);
+        return null;
+    }
+}
+
 // Display question to user
 function displayQuestion(nameData) {
     // Randomly choose to ask about male or female
     askedGender = Math.random() < 0.5 ? 'male' : 'female';
     
+    let theName = nameData.name.charAt(0).toUpperCase() + nameData.name.slice(1);
     // Display question
-    questionText.textContent = `What is the probability that ${nameData.name} is ${askedGender}?`;
+    questionText.textContent = `What is the probability that ${theName} is ${askedGender}?`;
     
     // Show question container, score display, and submit button
     questionContainer.style.display = 'block';
@@ -79,10 +103,11 @@ function checkAnswer(selectedOption) {
     
     // Define the ranges for each option
     const ranges = {
-        'A': { min: 0, max: 20 },
-        'B': { min: 20, max: 55 },
-        'C': { min: 55, max: 80 },
-        'D': { min: 80, max: 100 }
+        'A': { min: 0, max: 19 },
+        'B': { min: 20, max: 39 },
+        'C': { min: 40, max: 59 },
+        'D': { min: 60, max: 79 },
+        "E": { min: 80, max: 100 }
     };
     
     const selectedRange = ranges[selectedOption];
@@ -95,10 +120,16 @@ function checkAnswer(selectedOption) {
 
 // Handle search button click
 searchBtn.addEventListener('click', async () => {
-    const name = nameInput.value.trim();
+    const name = nameInput.value.trim().toLowerCase();
     
     if (!name) {
         alert('Please enter a name');
+        return;
+    }
+    
+    // Check if name has already been used in this game session
+    if (usedNames.has(name)) {
+        alert('This name has already been used. Please enter a different name.');
         return;
     }
     
@@ -107,6 +138,9 @@ searchBtn.addEventListener('click', async () => {
     
     if (currentNameData) {
         console.log('Name data:', currentNameData);
+        
+        // Add name to used names
+        usedNames.add(name);
         
         // Clear the input
         nameInput.value = '';
@@ -136,14 +170,35 @@ submitBtn.addEventListener('click', () => {
     
     // Check if game is over
     if (currentRound === totalRounds) {
-        alert(`${isCorrect ? 'Correct!' : 'Incorrect!'} Game Over! Your final score is ${score}/${totalRounds}`);
+        // Update score one last time if correct
+        updateScoreDisplay();
+        
+        // Fetch random recipe
+        fetchRandomRecipe();
         
         // Reset radio buttons at game end
         const radioButtons = document.querySelectorAll('input[name="probability"]');
         radioButtons.forEach(radio => radio.checked = false);
         
-        // Hide question container
+        // Hide question container and search container
         questionContainer.style.display = 'none';
+        document.querySelector('.search-container').style.display = 'none';
+        
+        // Display game over message based on score
+        let message = '';
+        if (score === 10) {
+            message = 'Agba Chef, you deserve a buffet';
+        } else if (score >= 6) {
+            message = 'You cooked, take your meal!';
+        } else {
+            message = 'You got cooked! nothing for you';
+        }
+        
+        gameOverMessage.textContent = message;
+        gameOverContainer.style.display = 'block';
+        
+        // Reset used names for new game
+        usedNames.clear();
         
         // TODO: Show recipes based on score
     } else {
@@ -157,4 +212,21 @@ submitBtn.addEventListener('click', () => {
         // Prepare for next round
         prepareNextRound();
     }
+});
+
+// Handle play again button click
+playAgainBtn.addEventListener('click', () => {
+    // Reset game state
+    score = 0;
+    currentRound = 1;
+    usedNames.clear();
+    
+    // Reset displays
+    updateScoreDisplay();
+    scoreDisplay.style.display = 'none';
+    gameOverContainer.style.display = 'none';
+    document.querySelector('.search-container').style.display = 'flex';
+    
+    // Reset name input
+    nameInput.value = '';
 });

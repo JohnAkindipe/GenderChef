@@ -10,7 +10,7 @@
     <div class="container">
         <h1 class="title">GenderChef</h1>
         <h2 class="subtitle">Cook or Get Cooked</h2>
-        
+        <h3>Guess 10 genders for a chance to get a free meal on us!</h3>        
         <div id="scoreDisplay" class="score-display" style="display: none;">
             <p class="score-text">Score: <span id="scoreValue">0</span>/10</p>
             <p class="round-text">Round: <span id="roundValue">1</span>/10</p>
@@ -26,22 +26,31 @@
             <div class="options-container">
                 <label class="option-label">
                     <input type="radio" name="probability" value="A" class="option-radio">
-                    <span class="option-text">A) 0 - 20%</span>
+                    <span class="option-text">A) 0 - 19%</span>
                 </label>
                 <label class="option-label">
                     <input type="radio" name="probability" value="B" class="option-radio">
-                    <span class="option-text">B) 20 - 55%</span>
+                    <span class="option-text">B) 20 - 39%</span>
                 </label>
                 <label class="option-label">
                     <input type="radio" name="probability" value="C" class="option-radio">
-                    <span class="option-text">C) 55 - 80%</span>
+                    <span class="option-text">C) 40 - 59%</span>
                 </label>
                 <label class="option-label">
                     <input type="radio" name="probability" value="D" class="option-radio">
-                    <span class="option-text">D) 80 - 100%</span>
+                    <span class="option-text">D) 60 - 79%</span>
+                </label>
+                <label class="option-label">
+                    <input type="radio" name="probability" value="E" class="option-radio">
+                    <span class="option-text">E) 80 - 100%</span>
                 </label>
             </div>
             <button id="submitBtn" class="submit-btn">Submit</button>
+        </div>
+        
+        <div id="gameOverContainer" class="game-over-container" style="display: none;">
+            <p id="gameOverMessage" class="game-over-message"></p>
+            <button id="playAgainBtn" class="play-again-btn">Play Again</button>
         </div>
     </div>
     
