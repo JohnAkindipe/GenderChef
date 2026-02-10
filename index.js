@@ -255,6 +255,6 @@ playAgainBtn.addEventListener('click', () => {
     playAgainBtn.style.display = 'inline-block';
     document.querySelector('.search-container').style.display = 'flex';
     
-    // Reset name input
+    //Reset name input
     nameInput.value = '';
 });
